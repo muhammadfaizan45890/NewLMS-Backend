@@ -7,7 +7,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://lms-courseacademy.vercel.app/auth/google/callback",
+      callbackURL: "newlms-backend-production.up.railway.app/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, cb) => {
       try {
