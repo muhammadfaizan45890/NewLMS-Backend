@@ -7,7 +7,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "newlms-backend-production.up.railway.app/auth/google/callback",
+      callbackURL: `${process.env.BACKEND_URL}/auth/google/callback`, // <-- use env variable
     },
     async (accessToken, refreshToken, profile, cb) => {
       try {
