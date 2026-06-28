@@ -9,7 +9,7 @@ import {
   addModuleToCourse,
   deleteModuleFromCourse,
   deleteCourse
-} from "../controllers/adminController.js";
+} from "../controllers/AdminController.js";
 
 const router = express.Router();
 
