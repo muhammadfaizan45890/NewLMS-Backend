@@ -105,7 +105,7 @@ const startServer = async () => {
     await connectDB();
     console.log("✅ Database connected");
 
-    console.log(`🔧 CLIENT_URL: ${process.env.CLIENT_URL || "http://localhost:5173"}`);
+    console.log(`🔧 CLIENT_URL: ${process.env.CLIENT_URL || "https://lms-courseacademy.vercel.app/"}`);
     console.log(
       `🔑 Google OAuth: ${process.env.GOOGLE_CLIENT_ID ? "Loaded ✅" : "Missing ❌"}`
     );
