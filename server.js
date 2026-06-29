@@ -4,6 +4,7 @@ import cors from "cors";
 import passport from "passport";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs"; // for directory checks
 
 import connectDB from "./database/db.js";
 import userRoute from "./routes/userRoute.js";
@@ -39,12 +40,23 @@ app.use(
 );
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // ✅ added for form data
 app.use(passport.initialize());
 
-// ✅ Serve static folders
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/upload", express.static(path.join(__dirname, "upload")));
-app.use("/files", express.static(path.join(__dirname, "public/files"))); // for notes & other uploads
+// ✅ Serve static folders (create them if missing to avoid warnings)
+const staticDirs = [
+  { route: "/uploads", dir: "uploads" },
+  { route: "/upload", dir: "upload" },
+  { route: "/files", dir: "public/files" },
+];
+staticDirs.forEach(({ route, dir }) => {
+  const fullPath = path.join(__dirname, dir);
+  if (!fs.existsSync(fullPath)) {
+    fs.mkdirSync(fullPath, { recursive: true });
+    console.log(`📁 Created static directory: ${fullPath}`);
+  }
+  app.use(route, express.static(fullPath));
+});
 
 // ------------------------------------------------------------
 // 3. Routes (no duplicates)
@@ -52,7 +64,7 @@ app.use("/files", express.static(path.join(__dirname, "public/files"))); // for 
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
 app.use("/admin", adminRoute);
-app.use("/enroll", enrollRoutes);        // ✅ only once
+app.use("/enroll", enrollRoutes);
 app.use("/api/modules", moduleRoutes);
 app.use("/refund", refundRoutes);
 app.use("/notes", notesRoutes);
@@ -69,7 +81,7 @@ app.get("/", (req, res) => {
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: `Route ${req.originalUrl} not found`,
+    message: `Route ${req.method} ${req.originalUrl} not found`,
   });
 });
 
@@ -105,10 +117,12 @@ const startServer = async () => {
     await connectDB();
     console.log("✅ Database connected");
 
-    console.log(`🔧 CLIENT_URL: ${process.env.CLIENT_URL || "https://lms-courseacademy.vercel.app/"}`);
+    console.log(`🔧 CLIENT_URL: ${process.env.CLIENT_URL || "https://lms-courseacademy.vercel.app"}`);
     console.log(
       `🔑 Google OAuth: ${process.env.GOOGLE_CLIENT_ID ? "Loaded ✅" : "Missing ❌"}`
     );
+    console.log(`📁 Uploads directory: ${path.join(__dirname, "uploads")}`);
+    console.log(`📁 Files directory: ${path.join(__dirname, "public/files")}`);
 
     app.listen(PORT, () => {
       console.log(`🚀 Server listening on port ${PORT}`);
