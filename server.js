@@ -34,7 +34,7 @@ app.use(
   cors({
     // ❌ Removed CLIENT_URL – now allowing all origins
     // For production, replace '*' with your actual frontend URL
-    origin: 'https://lms-courseacademy.vercel.app/',
+    origin: 'https://lms-courseacademy.vercel.app',
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -117,7 +117,7 @@ const startServer = async () => {
     await connectDB();
     console.log("✅ Database connected");
 
-    console.log(`🔧 CORS origin: ${'https://lms-courseacademy.vercel.app/'}`);  // updated log
+    console.log(`🔧 CORS origin: ${'https://lms-courseacademy.vercel.app'}`);  // updated log
     console.log(
       `🔑 Google OAuth: ${process.env.GOOGLE_CLIENT_ID ? "Loaded ✅" : "Missing ❌"}`
     );
