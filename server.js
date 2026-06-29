@@ -4,7 +4,7 @@ import cors from "cors";
 import passport from "passport";
 import path from "path";
 import { fileURLToPath } from "url";
-import fs from "fs"; // for directory checks
+import fs from "fs";
 
 import connectDB from "./database/db.js";
 import userRoute from "./routes/userRoute.js";
@@ -32,7 +32,9 @@ const PORT = process.env.PORT || 5000;
 // ------------------------------------------------------------
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "https://lms-courseacademy.vercel.app",
+    // ❌ Removed CLIENT_URL – now allowing all origins
+    // For production, replace '*' with your actual frontend URL
+    origin: 'https://lms-courseacademy.vercel.app/',
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -40,10 +42,10 @@ app.use(
 );
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // ✅ added for form data
+app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 
-// ✅ Serve static folders (create them if missing to avoid warnings)
+// ✅ Serve static folders (create them if missing)
 const staticDirs = [
   { route: "/uploads", dir: "uploads" },
   { route: "/upload", dir: "upload" },
@@ -59,7 +61,7 @@ staticDirs.forEach(({ route, dir }) => {
 });
 
 // ------------------------------------------------------------
-// 3. Routes (no duplicates)
+// 3. Routes
 // ------------------------------------------------------------
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
@@ -76,7 +78,7 @@ app.get("/", (req, res) => {
 });
 
 // ------------------------------------------------------------
-// 4. 404 handler – catch unknown routes
+// 4. 404 handler
 // ------------------------------------------------------------
 app.use((req, res) => {
   res.status(404).json({
@@ -86,12 +88,11 @@ app.use((req, res) => {
 });
 
 // ------------------------------------------------------------
-// 5. Global error handler (catches all sync/async errors)
+// 5. Global error handler
 // ------------------------------------------------------------
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
 
-  // Multer errors are forwarded from the route middleware
   if (err.name === "MulterError") {
     return res.status(400).json({
       success: false,
@@ -99,7 +100,6 @@ app.use((err, req, res, next) => {
     });
   }
 
-  // Default 500
   res.status(500).json({
     success: false,
     message:
@@ -117,7 +117,7 @@ const startServer = async () => {
     await connectDB();
     console.log("✅ Database connected");
 
-    console.log(`🔧 CLIENT_URL: ${process.env.CLIENT_URL || "https://lms-courseacademy.vercel.app"}`);
+    console.log(`🔧 CORS origin: ${'https://lms-courseacademy.vercel.app/'}`);  // updated log
     console.log(
       `🔑 Google OAuth: ${process.env.GOOGLE_CLIENT_ID ? "Loaded ✅" : "Missing ❌"}`
     );
